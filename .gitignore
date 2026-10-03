@@ -21,3 +21,4 @@ venv/
 .DS_Store
 # Machine-specific config
 config.local.yaml
+.idea/

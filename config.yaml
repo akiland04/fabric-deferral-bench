@@ -18,6 +18,7 @@ datasets:
     labels: CSV
 
 outputs_dir: runs
+derived_dir: derived # generated data, relative to data_root (never inside the raw dataset)
 
 # Validation and calibration are carved from ZJU-Leaper's official train split (D3).
 splits:
