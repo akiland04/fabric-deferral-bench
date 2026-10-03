@@ -1,0 +1,20 @@
+# Shared settings. Machine-specific paths go in config.local.yaml (not committed).
+seed: 42
+
+# Risk budget grid (D3). Fixed before any experiment runs.
+risk_budgets: [0.005, 0.01, 0.02, 0.05]
+
+datasets:
+  zju_leaper:
+    dir: ZJU-Leaper
+    images: Images
+    annotations: Annotations/xmls
+    masks: Annotations/masks
+    official_splits: ImageSets/total.json
+  tsfabrics:
+    dir: TSfabrics
+    images: IMAGE
+    masks: ANNOTATION
+    labels: CSV
+
+outputs_dir: runs
