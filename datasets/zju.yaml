@@ -1,0 +1,37 @@
+# ZJU-Leaper dataset manifest. Counts verified against the extracted release.
+name: ZJU-Leaper
+role: source
+paper: "Zhang et al. (2020), ZJU-Leaper: A Benchmark Dataset for Fabric Defect Detection and a Comparative Study, IEEE Transactions on Artificial Intelligence"
+homepage: http://www.qaas.zju.edu.cn/zju-leaper/
+source_url: https://drive.google.com/file/d/1zzoU3Aj21V62GWS8LBm217TsE5uFeMVB/view
+version: "README 'Created on 1 Feb, 2021'; Google Drive file ID 1zzoU3Aj21V62GWS8LBm217TsE5uFeMVB"
+download_date: 2026-09-12
+archive: ZJU-Leaper.7z (not retained)
+manifest_sha256: bf5d06d6c2009bf3ad7fd392880ccbd6d18bac3a4e9539217e6ce61232067f78  # per-file manifest of the extracted release, 213,400 files
+
+counts:
+  images: 94833
+  normal: 71127
+  defective: 23706
+  xml_annotations: 94833
+  masks: 23706
+  bounding_boxes: 35675
+  patterns: 19
+  groups: 5
+
+official_split:
+  train: {normal: 47423, defective: 15761}
+  test: {normal: 23704, defective: 7945}
+
+format:
+  images: JPEG 512x512; groups 1-4 RGB, group 5 greyscale
+  masks: PNG 512x512 greyscale, one per defective image
+  annotations: one XML per image (pattern, group, defective flag, mask file, 0..n bounding boxes)
+
+labels: binary only (<defective> 0/1); the release has no defect class field
+label_mapping: {defect: "defective = 1", normal: "defective = 0"}
+
+licence:
+  license_txt: CC BY-NC-SA 4.0
+  readme: academic / research use only; cite the source and paper
+  redistribute_images: false  # pending the licence decision; split ID lists and code are redistributable

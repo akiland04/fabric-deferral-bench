@@ -1,6 +1,5 @@
 # Datasets and derived data (licensed, large)
 data/
-datasets/
 *.zip
 *.7z
 
@@ -20,3 +19,5 @@ venv/
 
 # macOS
 .DS_Store
+# Machine-specific config
+config.local.yaml
