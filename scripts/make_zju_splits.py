@@ -56,7 +56,7 @@ def main() -> None:
 
     meta = {r.image_id: r for r in index}
     with open(out / "summary.csv", "w", newline="") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator="\n")
         w.writerow(["split", "pattern_id", "group_id", "defective", "images"])
         for name, ids in splits.items():
             counts = Counter((meta[i].pattern_id, meta[i].group_id, meta[i].defective) for i in ids)
