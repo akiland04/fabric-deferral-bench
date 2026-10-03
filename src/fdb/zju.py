@@ -4,8 +4,10 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
+from xml.etree import ElementTree as ET
 
 from .config import dataset_path
+from .yolo import Box
 
 N_PATTERNS = 19
 N_GROUPS = 5
@@ -42,3 +44,12 @@ def load_index(cfg: dict) -> list[ZjuImage]:
         for image_id, defective, split in _entries(image_sets / "Patterns" / f"pattern{p}.json")
     ]
     return sorted(index, key=lambda r: r.image_id)
+
+def read_boxes(xml_path: Path) -> tuple[bool, list[Box]]:
+    """(defective flag, boxes in absolute pixels) from one Annotations/xmls file."""
+    root = ET.parse(xml_path).getroot()
+    boxes = [
+        Box(*(float(b.findtext(k)) for k in ("xmin", "ymin", "xmax", "ymax")))
+        for b in root.findall("bbox")
+    ]
+    return root.findtext("defective") == "1", boxes
