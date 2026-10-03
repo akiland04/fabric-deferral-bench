@@ -18,8 +18,8 @@ from PIL import Image
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from fdb.config import dataset_path, load_config  # noqa: E402
 from fdb.layout import check_layout, link_or_copy, read_manifests, reset_dir  # noqa: E402
-from fdb.yolo import to_yolo_line  # noqa: E402
 from fdb.zju import load_index, read_boxes  # noqa: E402
+from fdb.yolo import to_yolo_line, write_data_yaml  # noqa: E402
 
 SPLITS = ("train", "val", "cal", "test")
 
@@ -82,7 +82,9 @@ def main() -> None:
     problems = check_layout(out, manifests)
     if problems:
         raise SystemExit("layout does not match the manifests:\n  " + "\n  ".join(problems))
+    data_yaml = write_data_yaml(out, train="images/train", val="images/val")
     print(f"layout matches the manifests: {out}")
+    print(f"data.yaml written: {data_yaml}")
 
 
 if __name__ == "__main__":
