@@ -1,0 +1,23 @@
+# Datasets and derived data (licensed, large)
+data/
+datasets/
+*.zip
+*.7z
+
+# Model weights and training outputs
+*.pt
+*.pth
+*.onnx
+runs/
+weights/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+EOF
