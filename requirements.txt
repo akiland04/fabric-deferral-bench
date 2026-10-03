@@ -1,0 +1,9 @@
+torch
+torchvision
+ultralytics
+numpy
+pandas
+pyyaml
+pillow
+matplotlib
+pytest
