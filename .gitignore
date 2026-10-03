@@ -1,6 +1,5 @@
 # Datasets and derived data (licensed, large)
 data/
-datasets/
 *.zip
 *.7z
 

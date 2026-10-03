@@ -18,3 +18,9 @@ datasets:
     labels: CSV
 
 outputs_dir: runs
+
+# Validation and calibration are carved from ZJU-Leaper's official train split (D3).
+splits:
+  zju_leaper:
+    val_frac: 0.10
+    cal_frac: 0.10
