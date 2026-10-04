@@ -1,0 +1,24 @@
+name: branch-policy
+
+on:
+  pull_request:
+    branches: [develop, pre-develop]           # only PRs targeting these two
+    types: [opened, synchronize, reopened, edited]  # 'edited' re-checks if the target branch is changed
+
+jobs:
+  source-branch-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check source branch name
+        env:
+          HEAD: ${{ github.head_ref }}   # branch the PR comes FROM
+          BASE: ${{ github.base_ref }}   # branch the PR goes INTO
+        run: |
+          case "$HEAD" in
+            feature/*|patch/*|release/*) echo "OK: $HEAD -> $BASE"; exit 0 ;;
+          esac
+          if [ "$BASE" = "develop" ] && [ "$HEAD" = "pre-develop" ]; then
+            echo "OK: pre-develop -> develop"; exit 0
+          fi
+          echo "::error::'$HEAD' is not allowed to merge into '$BASE'"
+          exit 1
