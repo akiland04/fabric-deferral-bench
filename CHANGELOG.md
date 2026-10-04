@@ -11,6 +11,9 @@ Task IDs (Txx) refer to the project tracker. Entries marked **Affects results** 
 - `fdb.sampling.stratified_sample`: exact-size proportional sampling (largest-remainder rounding), seeded and independent of input order.
 - `smoke` sizes in `config.yaml`.
 - Tests: `tests/test_sampling.py`, `tests/test_zju_smoke.py`.
+- Training (T20b): `scripts/train_yolo.py` trains a YOLO detector from a named profile in `config.yaml` and writes the run to `runs/train/<name>/`, adding `run_info.json` (wall and training time, seconds per epoch and per image, Python/PyTorch/Ultralytics versions, machine). It is the only training code that imports Ultralytics (AGPL-3.0); the harness reads prediction files only.
+- `train.smoke` profile in `config.yaml`: yolo11n COCO-pretrained, 10 epochs, 512 px, batch 8, MPS, seed 42.
+- `fdb.yolo.count_train_images`, with `tests/test_count_images.py`.
 
 ## [0.1.0] - 2026-10-04 — ZJU-Leaper data pipeline
 

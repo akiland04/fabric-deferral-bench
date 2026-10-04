@@ -33,3 +33,14 @@ smoke:
     val: 100
     cal: 100
     test: 100
+
+# YOLO training profiles (T20b smoke; T27 adds `full`). Run: python scripts/train_yolo.py --profile smoke
+train:
+  smoke:
+    model: yolo11n.pt   # nano, COCO-pretrained: fine-tune, don't train from scratch
+    data: smoke         # which data.yaml: smoke -> <layout>/smoke/data.yaml, full -> <layout>/data.yaml
+    epochs: 10          # tracker says 1; 10 gives non-trivial scores for T21-T31 and is still minutes
+    imgsz: 512          # ZJU's native size; YOLO's default 640 would upscale every image
+    batch: 8            # safe for 8 GB of shared memory
+    workers: 0          # load images in the main process; avoids data-loader stalls on macOS
+    device: mps         # Apple GPU
