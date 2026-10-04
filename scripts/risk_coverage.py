@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from fdb.curve import risk_coverage_curve, write_curve  # noqa: E402
+from fdb.curve import aurc, excess_aurc, optimal_aurc, risk_coverage_curve, write_curve  # noqa: E402
 from fdb.score_table import read_score_table  # noqa: E402
 
 
@@ -33,9 +33,12 @@ def main() -> None:
 
         first = next(p for p in points if p.counts.accepted > 0)
         last = points[-1]
+        c = last.counts
         print(f"{split:5s} {len(points):6d} points  "
               f"first non-empty: coverage {first.coverage:.1%}, risk {first.selective_risk:.1%}  "
               f"all auto-passed: risk {last.selective_risk:.1%} (= defect rate)  -> {out.name}")
+        print(f"      AURC {aurc(points):.4f}   optimal {optimal_aurc(c.n, c.defective):.4f}   "
+              f"E-AURC {excess_aurc(points):.4f}   (a useless score scores about {c.defective / c.n:.4f})")
 
 
 if __name__ == "__main__":
