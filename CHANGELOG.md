@@ -18,6 +18,10 @@ Task IDs (Txx) refer to the project tracker. Entries marked **Affects results** 
 - Inference adapter (T20c): `scripts/predict_yolo.py` runs trained weights over the smoke or full split manifests and writes `runs/predict/<name>/predictions_<split>.jsonl` plus `meta.json` (weights SHA-256, settings, versions). Refuses to overwrite an existing output folder; reads back and checks every file it writes.
 - `predict` settings in `config.yaml` (conf 0.001, iou 0.7, imgsz 512, max_det 300, MPS); `conf` is part of the frame score s(x) and is shared by cal, test and target data.
 - Tests: `tests/test_predictions.py`.
+- Full training profile (T27a): `train.full` in `config.yaml` — yolo11s COCO-pretrained, up to 100 epochs with early stopping (patience 20), 512 px, batch 32, SGD lr0 0.01, Ultralytics default augmentations plus vertical flips, AMP, checkpoint every 5 epochs, CUDA device 0. Chosen from ZJU-Leaper only, before any target data is used.
+- `fdb.yolo.split_profile`: splits a profile into model, data view and training arguments; refuses settings owned by the script (seed, run folder, resume). Tests: `tests/test_train_profiles.py` (also checks every profile in `config.yaml`).
+### Changed
+- `scripts/train_yolo.py` passes every setting in a profile to Ultralytics (previously only epochs, imgsz, batch, workers and device), stops early if a CUDA device is configured but unavailable, and records `epochs_configured`, `epochs_run` and the full settings in `run_info.json`.
 
 ## [0.1.0] - 2026-10-04 — ZJU-Leaper data pipeline
 

@@ -18,7 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from fdb.config import load_config  # noqa: E402
-from fdb.yolo import count_train_images  # noqa: E402
+from fdb.yolo import count_train_images, split_profile  # noqa: E402
 
 
 def data_yaml_for(cfg: dict, view: str) -> Path:
@@ -43,31 +43,32 @@ def main() -> None:
     args = parser.parse_args()
 
     cfg = load_config()
-    p = cfg["train"][args.profile]
-    data_yaml = data_yaml_for(cfg, p["data"])
+    if args.profile not in cfg["train"]:
+        raise SystemExit(f"no profile '{args.profile}' under train: in config.yaml")
+    model_name, view, train_args = split_profile(cfg["train"][args.profile])
+    data_yaml = data_yaml_for(cfg, view)
     if not data_yaml.exists():
         raise SystemExit(f"{data_yaml} not found: run scripts/convert_zju_yolo.py"
-                         + (" and scripts/make_zju_smoke.py" if p["data"] == "smoke" else ""))
+                         + (" and scripts/make_zju_smoke.py" if view == "smoke" else ""))
     n_images = count_train_images(data_yaml)
 
     import torch  # imported here so --help and config errors don't wait for PyTorch to load
     import ultralytics
     from ultralytics import YOLO
 
-    if p["device"] == "mps" and not torch.backends.mps.is_available():
+    device = str(train_args.get("device", ""))
+    if device == "mps" and not torch.backends.mps.is_available():
         raise SystemExit("device is 'mps' but PyTorch cannot see the Apple GPU")
+    if device not in ("", "cpu", "mps") and not torch.cuda.is_available():
+        raise SystemExit(f"device is '{device}' but PyTorch cannot see a CUDA GPU")
 
     project = Path(cfg["repo_root"]) / cfg["outputs_dir"] / "train"
     started = datetime.now(timezone.utc)
     t0 = time.perf_counter()
-    model = YOLO(p["model"])
+    model = YOLO(model_name)
     model.train(
         data=str(data_yaml),
-        epochs=p["epochs"],
-        imgsz=p["imgsz"],
-        batch=p["batch"],
-        workers=p["workers"],
-        device=p["device"],
+        **train_args,
         seed=cfg["seed"],
         deterministic=True,
         project=str(project),
@@ -87,13 +88,14 @@ def main() -> None:
         "profile": args.profile,
         "data_yaml": str(data_yaml),
         "train_images": n_images,
-        "epochs": p["epochs"],
+        "epochs_configured": train_args.get("epochs"),
+        "epochs_run": len(rows),
         "started_utc": started.isoformat(timespec="seconds"),
         "wall_seconds": round(seconds, 1),
         "train_seconds": round(train_seconds, 1),
         "seconds_per_epoch": round(train_seconds / len(rows), 1),
         "seconds_per_image_epoch": round(train_seconds / (len(rows) * n_images), 4),
-        "device": p["device"],
+        "settings": {"model": model_name, "data": view, **train_args},
         "python": platform.python_version(),
         "torch": torch.__version__,
         "ultralytics": ultralytics.__version__,
@@ -103,6 +105,7 @@ def main() -> None:
 
     print(f"run folder: {run_dir}")
     print(f"best weights: {best}")
+    print(f"{len(rows)} of {train_args.get('epochs')} epochs run (early stopping can end a run sooner)")
     print(f"{info['wall_seconds']} s wall clock; {info['seconds_per_epoch']} s per epoch "
           f"({info['seconds_per_image_epoch']} s per image) on {n_images} training images")
     for loss in ("train/box_loss", "train/cls_loss", "train/dfl_loss"):
