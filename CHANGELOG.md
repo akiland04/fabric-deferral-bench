@@ -20,6 +20,7 @@ Task IDs (Txx) refer to the project tracker. Entries marked **Affects results** 
 - Tests: `tests/test_predictions.py`.
 - Full training profile (T27a): `train.full` in `config.yaml` — yolo11s COCO-pretrained, up to 100 epochs with early stopping (patience 20), 512 px, batch 32, SGD lr0 0.01, Ultralytics default augmentations plus vertical flips, AMP, checkpoint every 5 epochs, CUDA device 0. Chosen from ZJU-Leaper only, before any target data is used.
 - `fdb.yolo.split_profile`: splits a profile into model, data view and training arguments; refuses settings owned by the script (seed, run folder, resume). Tests: `tests/test_train_profiles.py` (also checks every profile in `config.yaml`).
+- Frame score (T21a): `fdb.scoring.max_conf_score` implements s(x) = highest box confidence on a frame, or 0.0 when it has no boxes (M1; D1; D7 floor); higher means more likely defective. Rejects confidences outside [0, 1], including NaN. `fdb.scoring.score_frames` scores a whole predictions file with any scorer of the same shape and refuses duplicate images. Tests: `tests/test_scoring.py`.
 ### Changed
 - `scripts/train_yolo.py` passes every setting in a profile to Ultralytics (previously only epochs, imgsz, batch, workers and device), stops early if a CUDA device is configured but unavailable, and records `epochs_configured`, `epochs_run` and the full settings in `run_info.json`.
 
