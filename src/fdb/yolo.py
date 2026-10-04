@@ -49,3 +49,10 @@ def write_data_yaml(root: Path, train: str, val: str, names: dict[int, str] = CL
     out = root / "data.yaml"
     out.write_text(yaml.safe_dump(doc, sort_keys=False))
     return out
+
+def from_yolo_line(line: str, width: int, height: int) -> tuple[int, Box]:
+    """Inverse of to_yolo_line: (class, box in absolute pixels) decoded from one label line."""
+    cls, cx, cy, w, h = line.split()
+    cx, w = float(cx) * width, float(w) * width
+    cy, h = float(cy) * height, float(h) * height
+    return int(cls), Box(cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
