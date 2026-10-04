@@ -14,6 +14,10 @@ Task IDs (Txx) refer to the project tracker. Entries marked **Affects results** 
 - Training (T20b): `scripts/train_yolo.py` trains a YOLO detector from a named profile in `config.yaml` and writes the run to `runs/train/<name>/`, adding `run_info.json` (wall and training time, seconds per epoch and per image, Python/PyTorch/Ultralytics versions, machine). It is the only training code that imports Ultralytics (AGPL-3.0); the harness reads prediction files only.
 - `train.smoke` profile in `config.yaml`: yolo11n COCO-pretrained, 10 epochs, 512 px, batch 8, MPS, seed 42.
 - `fdb.yolo.count_train_images`, with `tests/test_count_images.py`.
+- Predictions contract (T20c): `fdb.predictions` defines the per-image JSON Lines format read by the harness (one record per image, `"boxes": []` when nothing is detected, absolute-pixel boxes, no ground truth), with a strict reader and a completeness check against the manifest. It never imports a detector library.
+- Inference adapter (T20c): `scripts/predict_yolo.py` runs trained weights over the smoke or full split manifests and writes `runs/predict/<name>/predictions_<split>.jsonl` plus `meta.json` (weights SHA-256, settings, versions). Refuses to overwrite an existing output folder; reads back and checks every file it writes.
+- `predict` settings in `config.yaml` (conf 0.001, iou 0.7, imgsz 512, max_det 300, MPS); `conf` is part of the frame score s(x) and is shared by cal, test and target data.
+- Tests: `tests/test_predictions.py`.
 
 ## [0.1.0] - 2026-10-04 — ZJU-Leaper data pipeline
 

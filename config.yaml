@@ -44,3 +44,11 @@ train:
     batch: 8            # safe for 8 GB of shared memory
     workers: 0          # load images in the main process; avoids data-loader stalls on macOS
     device: mps         # Apple GPU
+
+# Inference (T20c). `conf` is part of the frame score s(x): it must stay identical for cal, test and target data.
+predict:
+  conf: 0.001     # keep weak boxes so s(x) is informative; YOLO's default 0.25 would hide them
+  iou: 0.7        # NMS overlap, same as validation during training
+  imgsz: 512      # same as training
+  max_det: 300    # cap on boxes per image (revisit for the full test set at T30)
+  device: mps
