@@ -2,8 +2,8 @@ name: branch-policy
 
 on:
   pull_request:
-    branches: [develop, pre-develop]           # only PRs targeting these two
-    types: [opened, synchronize, reopened, edited]  # 'edited' re-checks if the target branch is changed
+    branches: [develop, pre-develop]
+    types: [opened, synchronize, reopened, edited]
 
 jobs:
   source-branch-check:
@@ -14,11 +14,16 @@ jobs:
           HEAD: ${{ github.head_ref }}   # branch the PR comes FROM
           BASE: ${{ github.base_ref }}   # branch the PR goes INTO
         run: |
+          # 1. Work branches can go into either protected branch
           case "$HEAD" in
             feature/*|patch/*|release/*) echo "OK: $HEAD -> $BASE"; exit 0 ;;
           esac
-          if [ "$BASE" = "develop" ] && [ "$HEAD" = "pre-develop" ]; then
-            echo "OK: pre-develop -> develop"; exit 0
-          fi
+
+          # 2. Promotion and back-merge between the two protected branches
+          case "$HEAD->$BASE" in
+            "pre-develop->develop") echo "OK: promote pre-develop -> develop"; exit 0 ;;
+            "develop->pre-develop") echo "OK: back-merge develop -> pre-develop"; exit 0 ;;
+          esac
+
           echo "::error::'$HEAD' is not allowed to merge into '$BASE'"
           exit 1
