@@ -49,3 +49,18 @@ def write_data_yaml(root: Path, train: str, val: str, names: dict[int, str] = CL
     out = root / "data.yaml"
     out.write_text(yaml.safe_dump(doc, sort_keys=False))
     return out
+
+def from_yolo_line(line: str, width: int, height: int) -> tuple[int, Box]:
+    """Inverse of to_yolo_line: (class, box in absolute pixels) decoded from one label line."""
+    cls, cx, cy, w, h = line.split()
+    cx, w = float(cx) * width, float(w) * width
+    cy, h = float(cy) * height, float(h) * height
+    return int(cls), Box(cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
+
+def count_train_images(data_yaml: Path) -> int:
+    """Number of training images a data.yaml points at (a folder of images or a .txt list of paths)."""
+    doc = yaml.safe_load(Path(data_yaml).read_text())
+    train = Path(doc["path"]) / doc["train"]
+    if train.is_file():
+        return sum(1 for line in train.read_text().splitlines() if line.strip())
+    return sum(1 for p in train.iterdir() if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".bmp"})

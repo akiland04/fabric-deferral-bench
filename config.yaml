@@ -25,3 +25,30 @@ splits:
   zju_leaper:
     val_frac: 0.10
     cal_frac: 0.10
+
+# Smoke run (T20): a small stratified sample of each split, to test the pipeline end to end.
+smoke:
+  zju_leaper:
+    train: 300
+    val: 100
+    cal: 100
+    test: 100
+
+# YOLO training profiles (T20b smoke; T27 adds `full`). Run: python scripts/train_yolo.py --profile smoke
+train:
+  smoke:
+    model: yolo11n.pt   # nano, COCO-pretrained: fine-tune, don't train from scratch
+    data: smoke         # which data.yaml: smoke -> <layout>/smoke/data.yaml, full -> <layout>/data.yaml
+    epochs: 10          # tracker says 1; 10 gives non-trivial scores for T21-T31 and is still minutes
+    imgsz: 512          # ZJU's native size; YOLO's default 640 would upscale every image
+    batch: 8            # safe for 8 GB of shared memory
+    workers: 0          # load images in the main process; avoids data-loader stalls on macOS
+    device: mps         # Apple GPU
+
+# Inference (T20c). `conf` is part of the frame score s(x): it must stay identical for cal, test and target data.
+predict:
+  conf: 0.001     # keep weak boxes so s(x) is informative; YOLO's default 0.25 would hide them
+  iou: 0.7        # NMS overlap, same as validation during training
+  imgsz: 512      # same as training
+  max_det: 300    # cap on boxes per image (revisit for the full test set at T30)
+  device: mps
