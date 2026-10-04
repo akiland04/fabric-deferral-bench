@@ -44,6 +44,27 @@ train:
     batch: 8            # safe for 8 GB of shared memory
     workers: 0          # load images in the main process; avoids data-loader stalls on macOS
     device: mps         # Apple GPU
+  full:
+    model: yolo11s.pt     # small, COCO-pretrained: a standard baseline (the research is the threshold, not the detector)
+    data: full            # <layout>/data.yaml: all 50,550 train images, 6,317 val
+    epochs: 100           # upper limit; T27b sets the final number from a timing run and the Kaggle budget
+    patience: 20          # stop early if val has not improved for 20 epochs; best.pt = best epoch on val
+    imgsz: 512            # native ZJU size, same as smoke and inference
+    batch: 32             # fixed, not 'auto', so the run does not depend on which GPU Kaggle assigns
+    optimizer: SGD        # explicit: 'auto' picks the optimizer by run length (smoke got AdamW)
+    lr0: 0.01             # standard starting learning rate for SGD
+    fliplr: 0.5           # left-right flips (Ultralytics default, stated for the record)
+    flipud: 0.5           # up-down flips: fabric has no 'up', so a flipped defect is still a defect (default 0.0)
+    hsv_h: 0.015          # colour/brightness jitter at Ultralytics defaults, chosen from ZJU only
+    hsv_s: 0.7
+    hsv_v: 0.4
+    mosaic: 1.0           # default: stitch 4 images into one training image
+    close_mosaic: 10      # default: no mosaic in the last 10 epochs
+    amp: true             # mixed precision: faster on Kaggle's NVIDIA GPU (not available on the Mac)
+    save_period: 5        # save a checkpoint every 5 epochs, so a Kaggle cut-off loses at most 5
+    workers: 4            # Kaggle has 4 CPU cores
+    device: 0             # the first NVIDIA GPU
+    # Augmentations not listed stay at Ultralytics 8.4.171 defaults; every value used is saved in <run>/args.yaml.
 
 # Inference (T20c). `conf` is part of the frame score s(x): it must stay identical for cal, test and target data.
 predict:

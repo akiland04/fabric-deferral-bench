@@ -8,6 +8,7 @@ import yaml
 
 DEFECT_CLASS = 0  # every defect type maps to the single class 'defect' (Class Mapping sheet)
 CLASS_NAMES = {DEFECT_CLASS: "defect"}
+RESERVED_TRAIN_KEYS = {"seed", "deterministic", "project", "name", "exist_ok", "resume"}
 
 
 @dataclass(frozen=True)
@@ -64,3 +65,14 @@ def count_train_images(data_yaml: Path) -> int:
     if train.is_file():
         return sum(1 for line in train.read_text().splitlines() if line.strip())
     return sum(1 for p in train.iterdir() if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".bmp"})
+
+def split_profile(profile: dict) -> tuple[str, str, dict]:
+    """(model, data view, Ultralytics train arguments) from one `train.<profile>` block of config.yaml."""
+    reserved = RESERVED_TRAIN_KEYS & profile.keys()
+    if reserved:
+        raise ValueError(f"set by train_yolo.py, not by a profile: {sorted(reserved)}")
+    for key in ("model", "data"):
+        if key not in profile:
+            raise ValueError(f"profile is missing '{key}'")
+    kwargs = {k: v for k, v in profile.items() if k not in ("model", "data")}
+    return profile["model"], profile["data"], kwargs
