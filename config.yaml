@@ -25,3 +25,11 @@ splits:
   zju_leaper:
     val_frac: 0.10
     cal_frac: 0.10
+
+# Smoke run (T20): a small stratified sample of each split, to test the pipeline end to end.
+smoke:
+  zju_leaper:
+    train: 300
+    val: 100
+    cal: 100
+    test: 100
