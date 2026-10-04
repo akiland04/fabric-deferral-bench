@@ -8,6 +8,7 @@ leakage test, so the same rule can also give D4's target-oracle threshold.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Iterable
 
 from .curve import CurvePoint
 from .metrics import Counts, coverage, escape_rate, selective_risk
@@ -53,3 +54,12 @@ def select_threshold(points: list[CurvePoint], eps: float) -> Selection:
         c = points[-1].counts
         return Selection(eps, DEFER_ALL, Counts(c.n, 0, 0, c.defective), feasible=False)
     return Selection(eps, best.t, best.counts, feasible=True)
+
+def sweep(points: list[CurvePoint], budgets: Iterable[float]) -> list[Selection]:
+    """t(eps) for every budget in the grid (D3), in ascending eps; the curve is built once by the caller."""
+    grid = sorted(budgets)
+    if not grid:
+        raise ValueError("the risk-budget grid is empty")
+    if len(set(grid)) != len(grid):
+        raise ValueError(f"the risk-budget grid has duplicates: {grid}")
+    return [select_threshold(points, eps) for eps in grid]
