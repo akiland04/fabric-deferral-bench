@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "model": {
+    "weights_sha256": "318e2f7b34eedc1e9bc2e5842f913b962cbc0ea113358c26c027af265fe565e2",
+    "subset": "smoke"
+  },
+  "score": "max_conf",
+  "rule": "auto-pass if s(x) < t",
+  "inference": {
+    "conf": 0.001,
+    "iou": 0.7,
+    "imgsz": 512,
+    "max_det": 300,
+    "device": "mps"
+  },
+  "selection": {
+    "decision": "D3",
+    "split": "cal",
+    "frames": 100,
+    "defective": 25,
+    "defect_rate": 0.25,
+    "image_ids_sha256": "c63d540541e6a70c6c43bd296bea34b2439b2213842d57ddebf3ae67a3f7d8b4"
+  },
+  "thresholds": [
+    {
+      "eps": 0.005,
+      "t": 0.012859,
+      "feasible": true,
+      "coverage": 0.02,
+      "selective_risk": 0.0,
+      "escape_rate": 0.0,
+      "accepted": 2,
+      "missed": 0
+    },
+    {
+      "eps": 0.01,
+      "t": 0.012859,
+      "feasible": true,
+      "coverage": 0.02,
+      "selective_risk": 0.0,
+      "escape_rate": 0.0,
+      "accepted": 2,
+      "missed": 0
+    },
+    {
+      "eps": 0.02,
+      "t": 0.012859,
+      "feasible": true,
+      "coverage": 0.02,
+      "selective_risk": 0.0,
+      "escape_rate": 0.0,
+      "accepted": 2,
+      "missed": 0
+    },
+    {
+      "eps": 0.05,
+      "t": 0.012859,
+      "feasible": true,
+      "coverage": 0.02,
+      "selective_risk": 0.0,
+      "escape_rate": 0.0,
+      "accepted": 2,
+      "missed": 0
+    }
+  ]
+}
